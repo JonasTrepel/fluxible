@@ -1,8 +1,9 @@
 #' wrap up function for fitting
 #' @description fits gas concentration over time with an exponential or
 #' linear model
-#' @param fit_type exponential or linear, depending on the wish of the user.
+#' @param fit_type exponential, linear or user_defined.
 #' Exponential is using the fit described in Zhao 2018
+#' Not that if "user_defined" is used, estimates_fct, optimize_fct, output_fct and diagnostic_fct have to be provided.
 #' @param conc_df dataframe of gas concentration over time
 #' @param t_window enlarge focus window before and after tmin and tmax
 #' @param Cz_window window used to calculate Cz, at the beginning of cut window
@@ -19,6 +20,11 @@
 #' @param datetime_col column with datetime of each concentration measurement
 #' @param conc_col column with gas concentration data
 #' @param fluxID_col column with ID of each flux
+# #' @param user_fit set to TRUE if you want to use a fitting model that is not available in the current version of Fluxible
+#' @param estimates_fct function providing the estimates need by the optimizing function
+#' @param optimize_fct function to optimize the model to the measured data
+#' @param output_fct function providing the modelled data based on the parameters from the optimize function
+#' @param diagnostic_fct function providing the adapted diagnostics to evaluate the quality of the fit of the model
 #' @return a dataframe with the slope at t zero,
 #' modelled concentration over time and exponential expression parameters
 #' @importFrom rlang .data
@@ -48,8 +54,21 @@ flux_fitting <- function(conc_df,
                          b_window = 10,
                          a_window = 10,
                          roll_width = 15,
-                         fit_type) {
-  fit_type <- match.arg(((fit_type)), c("exponential", "linear"))
+                         fit_type = "exponential",
+                        #  user_fit = "FALSE",
+                         estimates_fct = c(),
+                         optimize_fct = c(),
+                         output_fct = c(),
+                         diagnostic_fct = c()
+                         ) {
+  fit_type <- match.arg(((fit_type)), c("exponential",
+                                        "linear",
+                                        "user_defined"
+    ))
+
+  if(((fit_type)) == "user_defined") {
+    # HOW DO I PASS A FCT AS AN ARGUMENT!?
+  }
 
   if (((fit_type)) == "exponential") {
     conc_fitting <- flux_fitting_exp(
